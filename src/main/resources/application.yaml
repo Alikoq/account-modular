@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/modular_db
+    username: postgres
+    password: docker
+server:
+  port: 8181
