@@ -6,5 +6,5 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface AccountMapper  {
 
-    @Insert("INSERT INTO accountInfo(customer_id,)")
+    //@Insert("INSERT INTO accountInfo(customer_id,balance) values)")
 }
