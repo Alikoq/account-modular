@@ -1,10 +1,7 @@
-package com.modularbank.services.dto.requestPayloads;
+package com.modularbank.services.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.modularbank.services.dto.CurrencyTypes;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
 
@@ -15,7 +12,7 @@ public class AccountRequest {
     @JsonProperty("country")
     private String country;
     @JsonProperty("currencies")
-    private List<CurrencyTypes> currencies;
+    private List<String> currencies;
 
 
     public Long getCustomerId() {
@@ -34,11 +31,11 @@ public class AccountRequest {
         this.country = country;
     }
 
-    public List<CurrencyTypes> getCurrencies() {
+    public List<String> getCurrencies() {
         return currencies;
     }
 
-    public void setCurrencies(List<CurrencyTypes> currencies) {
+    public void setCurrencies(List<String> currencies) {
         this.currencies = currencies;
     }
 }

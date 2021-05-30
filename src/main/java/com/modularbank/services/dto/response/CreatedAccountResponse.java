@@ -1,11 +1,13 @@
-package com.modularbank.services.dto.responsePayloads;
+package com.modularbank.services.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.modularbank.services.dto.BalanceOfAccount;
-import com.modularbank.services.dto.CurrencyTypes;
+import com.modularbank.services.entity.accounts.AccountInfoEntity;
+import com.modularbank.services.entity.accounts.AccountsBalanceEntity;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CreatedAccountResponse {
@@ -15,6 +17,11 @@ public class CreatedAccountResponse {
     private List<BalanceOfAccount> balanceAccount;
     @JsonProperty("accountId")
     private Long accountId;
+
+    public CreatedAccountResponse(AccountInfoEntity accountInfoEntity) {
+        this.customerId=accountInfoEntity.getCustomerId();
+        this.accountId=accountInfoEntity.getId();
+    }
 
     public Long getCustomerId() {
         return customerId;
@@ -28,8 +35,8 @@ public class CreatedAccountResponse {
         return balanceAccount;
     }
 
-    public void setBalanceAccount(List<BalanceOfAccount> balanceAccount) {
-        this.balanceAccount = balanceAccount;
+    public void setBalanceAccount(List<AccountsBalanceEntity> balanceAccountsList) {
+        balanceAccount= balanceAccountsList.stream().map(BalanceOfAccount::fillBalance).collect(Collectors.toList());
     }
 
     public Long getAccountId() {

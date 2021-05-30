@@ -1,13 +1,19 @@
-package com.modularbank.services.dto.requestPayloads;
+package com.modularbank.services.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TransactionRequest {
+    @JsonProperty("accountId")
     private Long accountId;
+    @JsonProperty("amount")
     private Double amount;
+    @JsonProperty("currency")
     private String currency;
+    @JsonProperty("direction")
     private String directionOfTransaction;
+    @JsonProperty("description")
     private String description;
 
     public TransactionRequest() {

@@ -3,6 +3,9 @@ spring:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
-    password: docker
-server:
-  port: 8181
+    password: docker123
+  jpa:
+    hibernate:
+      ddl-auto: none
+  #server:
+ # port: 8181

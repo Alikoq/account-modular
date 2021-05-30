@@ -1,6 +1,10 @@
-package com.modularbank.services.dto.responsePayloads;
+package com.modularbank.services.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.modularbank.services.entity.transactions.TransactionInfoEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TransactionResponse {
     @JsonProperty("accountId")
@@ -18,7 +22,14 @@ public class TransactionResponse {
     @JsonProperty("balanceAfterTransaction")
     private Double balanceAfterTr;
 
-    public TransactionResponse() {
+    public TransactionResponse(TransactionInfoEntity transactionInfoEntity) {
+        this.accountId=transactionInfoEntity.getAccountId();
+        this.transactionId=transactionInfoEntity.getId();
+        this.amount=transactionInfoEntity.getAmount();
+        this.direction=transactionInfoEntity.getDirectionOfTransaction();
+        this.description=transactionInfoEntity.getDescription();
+        this.currency=transactionInfoEntity.getCurrency();
+        this.balanceAfterTr=transactionInfoEntity.getBalanceAfterTransaction();
     }
 
     public Long getAccountId() {
