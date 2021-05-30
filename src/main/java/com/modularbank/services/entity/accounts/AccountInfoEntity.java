@@ -20,10 +20,10 @@ public class AccountInfoEntity {
     private String country;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-//    @OneToMany(
-//            cascade = CascadeType.ALL)
-//    @JoinColumn(name = "account_id")
-//    private List<AccountsBalanceEntity> accountsBalanceEntityList;
+    @OneToMany(
+            cascade = CascadeType.ALL)
+    @JoinColumn(name = "account_id")
+    private List<AccountsBalanceEntity> accountsBalanceEntityList;
 
     public AccountInfoEntity() {
     }
@@ -76,11 +76,11 @@ public class AccountInfoEntity {
         this.customerId = customerId;
     }
 
-//    public List<AccountsBalanceEntity> getAccountsBalanceEntityList() {
-//        return accountsBalanceEntityList;
-//    }
-//
-//    public void setAccountsBalanceEntityList(List<AccountsBalanceEntity> accountsBalanceEntityList) {
-//        this.accountsBalanceEntityList = accountsBalanceEntityList;
-//    }
+    public List<AccountsBalanceEntity> getAccountsBalanceEntityList() {
+        return accountsBalanceEntityList;
+    }
+
+    public void setAccountsBalanceEntityList(List<AccountsBalanceEntity> accountsBalanceEntityList) {
+        this.accountsBalanceEntityList = accountsBalanceEntityList;
+    }
 }

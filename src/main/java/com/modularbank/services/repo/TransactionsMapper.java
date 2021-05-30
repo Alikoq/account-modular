@@ -24,7 +24,7 @@ public interface TransactionsMapper {
     private LocalDateTime createdAt;
     private Double balanceAfterTransaction;
  */
-    @Insert("INSERT INTO transaction_info ("
+    @Select("INSERT INTO transaction_info ("
             + "account_id,"
             + "amount,"
             + "currency,"
@@ -40,12 +40,7 @@ public interface TransactionsMapper {
             + "	#{transactionRequest.description} , "
             + "	#{transactionRequest.createdAt} , "
             + "	#{transactionRequest.balanceAfterTransaction} "
-            + ")")
-    @SelectKey(
-            statement="SELECT * FROM transaction_seq",
-            keyProperty="ID",before = false,resultType = Long.class
-
-    )
+            + ") returning id")
     Long createTransaction(@Param("transactionRequest") TransactionInfoEntity transactionRequest);
 
     /*
@@ -80,5 +75,29 @@ public interface TransactionsMapper {
             //@Result(property="signUpWith.deviceName", column="device_name")
     })
      List<TransactionInfoEntity> getTransactionByAccountId(@Param("accountId") Long accountId);
+
+    @Select(("SELECT "
+            + "	tr.id as ID, "
+            + "	tr.account_id as account_id,"
+            + "	tr.currency as currency,"
+            + "	tr.direction_transaction as direction_transaction,"
+            + "	tr.description as description,"
+            + "	tr.created_at as created_at,"
+            + "	tr.amount as amount,"
+            + "	tr.balance_after_transaction as balance_after_transaction"
+            + " FROM "
+            + "	transaction_info tr WHERE tr.id=#{transactionId}"))
+    @Results(value={
+            @Result(property="id" , column="ID"),
+            @Result(property="accountId" , column="account_id"),
+            @Result(property="currency", column="currency"),
+            @Result(property="directionOfTransaction", column="direction_transaction"),
+            @Result(property="description", column="description"),
+            @Result(property="amount", column="amount"),
+            @Result(property="createdAt", column="created_at"),
+            @Result(property="balanceAfterTransaction", column="balance_after_transaction"),
+            //@Result(property="signUpWith.deviceName", column="device_name")
+    })
+     TransactionInfoEntity getTransactionById(@Param("transactionId") Long trId);
 
 }

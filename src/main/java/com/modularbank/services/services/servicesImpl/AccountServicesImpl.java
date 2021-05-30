@@ -7,6 +7,7 @@ import com.modularbank.services.dto.response.CreatedAccountResponse;
 import com.modularbank.services.entity.accounts.AccountInfoEntity;
 import com.modularbank.services.entity.accounts.AccountsBalanceEntity;
 import com.modularbank.services.repo.AccountMapper;
+import com.modularbank.services.services.rabbitmq.ProducerService;
 import com.modularbank.services.services.servicesInterface.AccountServices;
 import org.springframework.stereotype.Service;
 
@@ -17,28 +18,37 @@ import java.util.Optional;
 @Service
 public class AccountServicesImpl implements AccountServices {
     private AccountMapper accountMapper;
-    public AccountServicesImpl(AccountMapper accountMapper){
+    private ProducerService producerService;
+    public AccountServicesImpl(AccountMapper accountMapper,ProducerService producerService){
+        this.producerService=producerService;
         this.accountMapper = accountMapper;
+    }
+
+    public List<AccountsBalanceEntity> balanceEntitiesFilling(AccountRequest accountRequest,Long accountId){
+        List<AccountsBalanceEntity> balanceEntities=new ArrayList<>();
+        for(String c: accountRequest.getCurrencies()){
+            AccountsBalanceEntity   accountsBalanceEntity = new AccountsBalanceEntity();
+            accountsBalanceEntity.setAmount(0.0);
+            accountsBalanceEntity.setCurrency(c);
+            accountsBalanceEntity.setAccountId(accountId);
+            balanceEntities.add(accountsBalanceEntity);
+        }
+        return balanceEntities;
     }
     @Override
     public CommonResponse<CreatedAccountResponse> createAccount(AccountRequest accountRequest) {
         AccountInfoEntity accountInfoEntity = new AccountInfoEntity(accountRequest);
-        List<AccountsBalanceEntity> balanceEntities=new ArrayList<>();
-
-        for(String c: accountRequest.getCurrencies()){
-           AccountsBalanceEntity   accountsBalanceEntity = new AccountsBalanceEntity();
-            accountsBalanceEntity.setAmount(0.0);
-            accountsBalanceEntity.setCurrency(c);
-            balanceEntities.add(accountsBalanceEntity);
-        }
-       // accountInfoEntity.setAccountsBalanceEntityList(balanceEntities);
-
-        Long createdAcc= accountMapper.createAccount(accountInfoEntity);
+        producerService.publishMessageToQueue(accountRequest);
+        Long accountId= accountMapper.createAccount(accountInfoEntity);
+        List<AccountsBalanceEntity> balanceEntities=balanceEntitiesFilling(accountRequest,accountId);
+        accountInfoEntity.setAccountsBalanceEntityList(balanceEntities);
+        accountMapper.createAccountBalances(accountInfoEntity.getAccountsBalanceEntityList());
+        Optional<AccountInfoEntity> accountInfoEntityResponse= accountMapper.getAccountById(accountId);
+        List<AccountsBalanceEntity> balancesList= accountMapper.selectBalances(accountId);
         CreatedAccountResponse createdAccountResponse = new CreatedAccountResponse(accountInfoEntity);
-        /** must be changed*/
-        createdAccountResponse.setAccountId(createdAcc );
-        createdAccountResponse.setCustomerId(createdAcc );
-       // createdAccountResponse.setBalanceAccount(createdAccount.getAccountsBalanceEntityList());
+        createdAccountResponse.setAccountId(accountId);
+        createdAccountResponse.setCustomerId(accountInfoEntityResponse.get().getCustomerId() );
+        createdAccountResponse.setBalanceAccount(balancesList);
         return fillCommonResponse(createdAccountResponse,fillMessage("Account is created","success"),200);
     }
 
@@ -68,5 +78,27 @@ public class AccountServicesImpl implements AccountServices {
             return fillCommonResponse(createdAccountResponse,fillMessage("Account not found","error"),200);
 
         }
+    }
+
+    public AccountInfoEntity findAccountById(Long accountId){
+        Optional<AccountInfoEntity> accountInfoEntities=  accountMapper.getAccountById(accountId);
+        return accountInfoEntities.orElse(null);
+    }
+
+    public AccountsBalanceEntity updateBalanceByAccIdAndCurrency(Long accountId,Double amount,String currency,String direction){
+        AccountsBalanceEntity currentBalanceEntity=accountMapper.selectBalanceByCurrencyAndAccountId(accountId,currency);
+
+        if(direction.equals("IN")){
+            currentBalanceEntity.setAmount(amount+currentBalanceEntity.getAmount());
+        }else{
+            currentBalanceEntity.setAmount(currentBalanceEntity.getAmount()-amount);
+        }
+        accountMapper.update(accountId,currentBalanceEntity.getAmount(),currency);
+
+       return accountMapper.selectBalanceByCurrencyAndAccountId(accountId,currency);
+    }
+
+    public AccountsBalanceEntity balanceAfterTransaction(Long accountId,String currency){
+        return accountMapper.selectBalanceByCurrencyAndAccountId(accountId,currency);
     }
 }

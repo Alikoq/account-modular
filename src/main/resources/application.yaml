@@ -1,11 +1,25 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: docker123
+   # url: jdbc:postgresql://modular-postgres-db:5432/modular
+    url: jdbc:postgresql://localhost:5432/modular
+    username: modular
+    password: modular
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
   #server:
  # port: 8181
+  rabbitmq:
+    #host: modular-rabbit-mq
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+############## properties
+modular:
+  rabbitmq:
+    queue: modular_queue
+    exchange: modular_exchange
+    routingkey: modular_routing_key

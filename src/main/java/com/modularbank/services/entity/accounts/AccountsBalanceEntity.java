@@ -3,20 +3,18 @@ package com.modularbank.services.entity.accounts;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-//@Entity
-//@Table(name = "account_balances")
+@Entity
+@Table(name = "account_balances")
 public class AccountsBalanceEntity {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-  //  @ManyToOne(fetch = FetchType.LAZY)
-    //private AccountInfoEntity account;
-   // @Column(name = "amount")
+    @Column(name = "account_id")
+    private Long accountId;
+    @Column(name = "amount")
     private Double amount;
-  //  @Column(name = "currency")
+    @Column(name = "currency")
     private String currency;
-
-
 
     public Double getAmount() {
         return amount;
@@ -42,6 +40,11 @@ public class AccountsBalanceEntity {
         this.id = id;
     }
 
+    public Long getAccountId() {
+        return accountId;
+    }
 
-
+    public void setAccountId(Long accountId) {
+        this.accountId = accountId;
+    }
 }

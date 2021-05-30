@@ -1,0 +1,27 @@
+version: "3.3"
+services:
+  app:
+    container_name: modular-bank-api
+    restart: always
+    build: .
+    #image: aliguliyev75/modularbank_app
+    ports:
+      - "8080:8080"
+    links:
+      - modular-postgres-db
+      - modular-rabbit-mq
+  modular-postgres-db:
+    environment:
+      POSTGRES_DB: modular
+      POSTGRES_USER: modular
+      POSTGRES_PASSWORD: modular
+    container_name: modular-postgres-db
+    image: postgres
+    ports:
+      - "5432:5432"
+
+  modular-rabbit-mq:
+    container_name: modular-rabbit-mq
+    image: rabbitmq:management
+    ports:
+      - "5672:5672"
