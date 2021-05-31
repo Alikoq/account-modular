@@ -14,6 +14,14 @@ public class AccountRequest {
     @JsonProperty("currencies")
     private List<String> currencies;
 
+    public AccountRequest() {
+    }
+
+    public AccountRequest(Long customerId, String country, List<String> currencies) {
+        this.customerId = customerId;
+        this.country = country;
+        this.currencies = currencies;
+    }
 
     public Long getCustomerId() {
         return customerId;
@@ -38,4 +46,7 @@ public class AccountRequest {
     public void setCurrencies(List<String> currencies) {
         this.currencies = currencies;
     }
+
+
+
 }

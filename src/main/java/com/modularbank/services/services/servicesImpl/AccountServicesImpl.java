@@ -6,6 +6,8 @@ import com.modularbank.services.dto.request.AccountRequest;
 import com.modularbank.services.dto.response.CreatedAccountResponse;
 import com.modularbank.services.entity.accounts.AccountInfoEntity;
 import com.modularbank.services.entity.accounts.AccountsBalanceEntity;
+import com.modularbank.services.enums.CurrenciesEnum;
+import com.modularbank.services.exception.CustomNotFoundException;
 import com.modularbank.services.repo.AccountMapper;
 import com.modularbank.services.services.rabbitmq.ProducerService;
 import com.modularbank.services.services.servicesInterface.AccountServices;
@@ -14,12 +16,16 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class AccountServicesImpl implements AccountServices {
     private AccountMapper accountMapper;
     private ProducerService producerService;
-    public AccountServicesImpl(AccountMapper accountMapper,ProducerService producerService){
+
+
+    public AccountServicesImpl(AccountMapper accountMapper, ProducerService producerService){
         this.producerService=producerService;
         this.accountMapper = accountMapper;
     }
@@ -35,8 +41,23 @@ public class AccountServicesImpl implements AccountServices {
         }
         return balanceEntities;
     }
+    public void checkCurrencyIsValid(AccountRequest accountRequest){
+        List<String> enumNames = Stream.of(CurrenciesEnum.values())
+                .map(Enum::name)
+                .collect(Collectors.toList());
+        accountRequest.getCurrencies().stream()
+                .filter(i->(!enumNames.contains(i)))
+                .findFirst()
+                .ifPresent(o ->{
+                    throw new CustomNotFoundException(String.format("Currency %s is not valid ",o),404);
+                } );
+    }
     @Override
     public CommonResponse<CreatedAccountResponse> createAccount(AccountRequest accountRequest) {
+
+       checkCurrencyIsValid(accountRequest
+       );
+
         AccountInfoEntity accountInfoEntity = new AccountInfoEntity(accountRequest);
         producerService.publishMessageToQueue(accountRequest);
         Long accountId= accountMapper.createAccount(accountInfoEntity);
@@ -72,16 +93,22 @@ public class AccountServicesImpl implements AccountServices {
         Optional<AccountInfoEntity> accountInfoEntities=  accountMapper.getAccountById(accountId);
         CreatedAccountResponse createdAccountResponse=null;
         if(accountInfoEntities.isPresent()){
-            createdAccountResponse=new CreatedAccountResponse(accountInfoEntities.get());
+            List<AccountsBalanceEntity> balancesList= accountMapper.selectBalances(accountId);
+             createdAccountResponse=new CreatedAccountResponse(accountInfoEntities.get());
+            createdAccountResponse.setBalanceAccount(balancesList);
             return fillCommonResponse(createdAccountResponse,fillMessage("Account found","success"),200);
         }else {
-            return fillCommonResponse(createdAccountResponse,fillMessage("Account not found","error"),200);
+           // return fillCommonResponse(createdAccountResponse,fillMessage("Account not found","error"),200);
+            throw new CustomNotFoundException(String.format("Account %d not found ",accountId),404);
 
         }
     }
 
     public AccountInfoEntity findAccountById(Long accountId){
         Optional<AccountInfoEntity> accountInfoEntities=  accountMapper.getAccountById(accountId);
+        if(accountInfoEntities.isEmpty()){
+            throw new CustomNotFoundException(String.format("Account %d not found ",accountId),404);
+        }
         return accountInfoEntities.orElse(null);
     }
 

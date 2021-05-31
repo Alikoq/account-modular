@@ -1,6 +1,8 @@
 package com.modularbank.services.services.rabbitmq;
 
 import com.modularbank.services.config.RabbitMqConfig;
+import com.modularbank.services.dto.request.AccountRequest;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.support.RabbitExceptionTranslator;
 import org.springframework.stereotype.Service;
@@ -17,7 +19,12 @@ public class ProducerService {
     public  <T> void publishMessageToQueue(T object){
          System.err.println("Start");
          System.err.println(rabbitMqConfig.getExchange());
-         template.convertAndSend(rabbitMqConfig.getExchange(),rabbitMqConfig.getQueue(),object);
+         template.convertAndSend(rabbitMqConfig.getExchange(),rabbitMqConfig.getRoutingKey(),object);
          System.err.println("End");
     }
+
+//    @RabbitListener(queues = "modular_queue" )
+//    public void consumer(AccountRequest accountRequest){
+//        System.err.println(accountRequest.getCountry()+":::::::::::"+accountRequest.getCustomerId());
+//    }
 }

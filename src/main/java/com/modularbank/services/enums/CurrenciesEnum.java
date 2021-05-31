@@ -1,5 +1,7 @@
 package com.modularbank.services.enums;
 
+import java.util.List;
+
 public enum CurrenciesEnum {
     EUR("EUR"),USD("USD"),SEK("SEK"),GBP("GBP");
     private String currency;

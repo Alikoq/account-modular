@@ -28,7 +28,7 @@ public class TransactionsServiceImpl implements TransactionsService {
 
     public boolean checkIfAccountExist(Long accId){
        AccountInfoEntity accountInfoEntity= accountServices.findAccountById(accId);
-       return accountInfoEntity==null ? false:true;
+       return accountInfoEntity != null;
     }
 
     public AccountsBalanceEntity updateBalanceOfAccount(Long accId,Double amount,String currency,String direction){
@@ -44,8 +44,7 @@ public class TransactionsServiceImpl implements TransactionsService {
         //transaction already is created then we must update balance for account
         AccountsBalanceEntity balanceAfterUpdate= updateBalanceOfAccount(transactionRequest.getAccountId(), transactionRequest.getAmount(),transactionRequest.getCurrency(),transactionRequest.getDirectionOfTransaction());
         TransactionInfoEntity createdTransaction= transactionsMapper.getTransactionById(createTrId);
-        AccountsBalanceEntity balanceAfterTransaction=accountServices.balanceAfterTransaction(transactionRequest.getAccountId(), transactionRequest.getCurrency());
-        createdTransaction.setBalanceAfterTransaction(balanceAfterTransaction.getAmount());
+         createdTransaction.setBalanceAfterTransaction(balanceAfterUpdate.getAmount());
         TransactionResponse createTransactionResponse = new TransactionResponse(createdTransaction);
         return fillCommonResponse(createTransactionResponse,fillMessage("Transaction is created","success"),200);
     }

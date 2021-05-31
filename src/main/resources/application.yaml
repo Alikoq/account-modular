@@ -1,8 +1,8 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-   # url: jdbc:postgresql://modular-postgres-db:5432/modular
-    url: jdbc:postgresql://localhost:5432/modular
+    url: jdbc:postgresql://modular-postgres-db:5432/modular
+    #url: jdbc:postgresql://localhost:5432/modular
     username: modular
     password: modular
   jpa:
@@ -12,8 +12,8 @@ spring:
   #server:
  # port: 8181
   rabbitmq:
-    #host: modular-rabbit-mq
-    host: localhost
+    host: modular-rabbit-mq
+   # host: localhost
     port: 5672
     username: guest
     password: guest

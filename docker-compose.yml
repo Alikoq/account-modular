@@ -3,8 +3,8 @@ services:
   app:
     container_name: modular-bank-api
     restart: always
-    build: .
-    #image: aliguliyev75/modularbank_app
+    #build: .
+    image: aliguliyev75/modularbank_app
     ports:
       - "8080:8080"
     links:
@@ -25,3 +25,4 @@ services:
     image: rabbitmq:management
     ports:
       - "5672:5672"
+      - "15672:15672"

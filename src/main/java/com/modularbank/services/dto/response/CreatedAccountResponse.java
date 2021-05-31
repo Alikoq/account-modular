@@ -36,6 +36,7 @@ public class CreatedAccountResponse {
     }
 
     public void setBalanceAccount(List<AccountsBalanceEntity> balanceAccountsList) {
+
         balanceAccount= balanceAccountsList.stream().map(BalanceOfAccount::fillBalance).collect(Collectors.toList());
     }
 
