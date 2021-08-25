@@ -9,6 +9,7 @@ import com.modularbank.services.entity.accounts.AccountsBalanceEntity;
 import com.modularbank.services.enums.CurrenciesEnum;
 import com.modularbank.services.exception.CustomNotFoundException;
 import com.modularbank.services.repo.AccountMapper;
+import com.modularbank.services.repo.jpa.AccountDataRepo;
 import com.modularbank.services.services.rabbitmq.ProducerService;
 import com.modularbank.services.services.servicesInterface.AccountServices;
 import org.springframework.stereotype.Service;
@@ -22,8 +23,11 @@ import java.util.stream.Stream;
 @Service
 public class AccountServicesImpl implements AccountServices {
     private AccountMapper accountMapper;
+    private AccountDataRepo accountDataRepo;
     private ProducerService producerService;
 
+    public AccountServicesImpl() {
+    }
 
     public AccountServicesImpl(AccountMapper accountMapper, ProducerService producerService){
         this.producerService=producerService;
@@ -55,11 +59,10 @@ public class AccountServicesImpl implements AccountServices {
     @Override
     public CommonResponse<CreatedAccountResponse> createAccount(AccountRequest accountRequest) {
 
-       checkCurrencyIsValid(accountRequest
-       );
+       checkCurrencyIsValid(accountRequest);
 
         AccountInfoEntity accountInfoEntity = new AccountInfoEntity(accountRequest);
-        producerService.publishMessageToQueue(accountRequest);
+       //  producerService.publishMessageToQueue(accountRequest);
         Long accountId= accountMapper.createAccount(accountInfoEntity);
         List<AccountsBalanceEntity> balanceEntities=balanceEntitiesFilling(accountRequest,accountId);
         accountInfoEntity.setAccountsBalanceEntityList(balanceEntities);
@@ -128,4 +131,6 @@ public class AccountServicesImpl implements AccountServices {
     public AccountsBalanceEntity balanceAfterTransaction(Long accountId,String currency){
         return accountMapper.selectBalanceByCurrencyAndAccountId(accountId,currency);
     }
+
+
 }
