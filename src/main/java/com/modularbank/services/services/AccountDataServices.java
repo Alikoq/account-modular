@@ -28,8 +28,8 @@ public class AccountDataServices {
     }
 
     public List<AccountDataEntity> getAllAccounts() {
-        List<AccountDataEntity> accountInfoEntity = accountDataRepo.findAll();
-        return accountInfoEntity;
+        List<AccountDataEntity> accuntInfoEntity = accountDataRepo.findAll();
+        return accuntInfoEntity;
     }
 
     public void addAccount(AccountDataEntity accountDataEntity){
